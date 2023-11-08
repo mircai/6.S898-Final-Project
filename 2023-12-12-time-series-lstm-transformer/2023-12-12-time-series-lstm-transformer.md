@@ -16,11 +16,7 @@ Thus, we would like to explore the effectiveness of transformers specifically fo
 
 To perform a comparative analysis of LSTMs and transformers, we intend to utilize PyTorch to implement an LSTM model and a transformer model that will be both trained on a time-series datasets to pinpoint the advantages and disadvantages of each architecture. We will be comparing the following features for datasets:
 
-- **Small versus Large Datasets**: The size of a dataset should play a role in the performance of an LSTM model versus a transformer model. A study [1] done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21\% relative difference with 25\% of the dataset versus 2.25\% relative difference with 80\% of the dataset. This makes sense since BERT is a robust transformer architecture that needs more data. As shown in Figure 1, while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases. With smaller datasets, it's likely that BERT will overfit. We predict that in time series datasets, a similar pattern should appear where LSTMs work better for smaller datasets and transformers become better for larger datasets.
-
-<p align="center">
-  <img src="http://some_place.com/image.png" />
-</p>
+- **Small versus Large Datasets**: The size of a dataset should play a role in the performance of an LSTM model versus a transformer model. A study [1] done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21\% relative difference with 25\% of the dataset versus 2.25\% relative difference with 80\% of the dataset. This makes sense since BERT is a robust transformer architecture that needs more data. As shown in the figure below from [1], while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases. With smaller datasets, it's likely that BERT will overfit. We predict that in time series datasets, a similar pattern should appear where LSTMs work better for smaller datasets and transformers become better for larger datasets.
 
 ![Figure 1 - LSTM outperforms BERT for all partitions of a dataset](assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png)
 
