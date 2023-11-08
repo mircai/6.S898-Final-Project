@@ -18,6 +18,10 @@ To perform a comparative analysis of LSTMs and transformers, we intend to utiliz
 
 - **Small versus Large Datasets**: The size of a dataset should play a role in the performance of an LSTM model versus a transformer model. A study [1] done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21\% relative difference with 25\% of the dataset versus 2.25\% relative difference with 80\% of the dataset. This makes sense since BERT is a robust transformer architecture that needs more data. As shown in Figure 1, while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases. With smaller datasets, it's likely that BERT will overfit. We predict that in time series datasets, a similar pattern should appear where LSTMs work better for smaller datasets and transformers become better for larger datasets.
 
+<p align="center">
+  <img src="http://some_place.com/image.png" />
+</p>
+
 ![Figure 1 - LSTM outperforms BERT for all partitions of a dataset](assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png)
 
 - **Clean versus Noisy Datasets**: Theoretically, LSTMs are more robust to noisy data due to its ability to capture local dependencies. On the other hand, the self-attention mechanisms in transformers propagate errors and may struggle with sequences that have a high degree of noise. Electronic traders have been recently attempting to apply transformer models in financial time series prediction to beat LSTMs [2]. Financial data sets are known to be extremely noisy. Experimental results have shown that transformer models have limited advantage in absolute price sequence prediction. In other scenarios like price difference and price movement, LSTMs had better performance.
@@ -51,8 +55,8 @@ As depicted in the table, we have a keen interest in assessing whether transform
 
 ## 4. References
 
-[1] A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020. \
-[2] P. Bilokon and Y. Qiu, “Transformers versus lstms for electronic trading,” arXiv preprint arXiv:2309.11400, 2023. \
-[3] A. Zeng, M.Chen, L. Zhang, and Q. Xu, “Are transformers effective for time series forecasting?,” arXiv preprint arXiv:2205.13504, 2022. \
-[4] “Metric:mase.” \
-[5] “Hourly energy consumption.” \
+[1] A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020.
+[2] P. Bilokon and Y. Qiu, “Transformers versus lstms for electronic trading,” arXiv preprint arXiv:2309.11400, 2023.
+[3] A. Zeng, M.Chen, L. Zhang, and Q. Xu, “Are transformers effective for time series forecasting?,” arXiv preprint arXiv:2205.13504, 2022.
+[4] “Metric:mase.”
+[5] “Hourly energy consumption.”
