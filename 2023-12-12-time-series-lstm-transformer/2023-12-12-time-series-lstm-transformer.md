@@ -17,10 +17,9 @@ With the growth of ChatGPT in the recent years, extensive research has been done
 
 ### 2.1 Effect of Dataset Size
 The size of a dataset plays an important role in the performance of an LSTM model versus a transformer model. A study [[1]](#1) done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21% relative difference with 25% of the dataset versus 2.25% relative difference with 80% of the dataset. This makes sense since BERT is a robust transformer architecture that performs better with more data. As shown in the figure below from [[1]](#1), while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases.
-<div class="image-container">
+<p align="center">
   <img src="./assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png" alt="Image Description">
-  <p class="caption"></p>
-</div>
+</p>
 While we perform a similar methodology which is discussed further in section 4.1, the major difference is in the type of data we test. Instead of measuring classification accuracy for NLP tasks, this study measures the mean squared error (MSE) loss for regression time series data. 
 
 ### 2.2 Effect of Noisy Datasets
@@ -35,23 +34,3 @@ While we perform a similar methodology which is discussed further in section 4.1
 ## 6. References
 <a id="1">[1]</a> 
 A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020.
-
-
-<style>
-    .image-container {
-      text-align: center;
-    }
-    .image-container img {
-      display: block;
-      margin: 0 auto;
-      /* Additional styling for the image */
-      width: 300px; /* Adjust the width as needed */
-      height: auto;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .caption {
-      font-style: italic;
-      color: #666;
-    }
-  </style>
