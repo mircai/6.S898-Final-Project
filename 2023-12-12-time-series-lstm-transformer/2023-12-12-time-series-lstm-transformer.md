@@ -24,6 +24,9 @@ While we perform a similar methodology which is discussed further in section 4.1
 
 ### 2.2 Effect of Noisy Datasets
 
+Theoretically, LSTMs are more robust to noisy data due to its ability to capture local dependencies. On the other hand, the self-attention mechanisms in transformers propagate errors and may struggle with sequences that have a high degree of noise. Electronic traders have been recently attempting to apply transformer models in financial time series prediction to beat LSTMs [[2]](#2). Largely focused on type of assets, the research showed that transformer models have limited advantage in absolute price sequence prediction. In other scenarios like price difference and price movement, LSTMs had better performance.
+
+Financial data sets are known to be extremely noisy, and in addition, very hard to find due to their confidential nature. The application of [[2]](#2) gave inspiration to study how the "amount" of noisiness would affect the LSTM and transformer models. Discussed further in section 4.2, this study added various amounts of noise to a clean dataset to see how this would affect each architecture.
 
 ## 3. Dataset
 
@@ -34,3 +37,5 @@ While we perform a similar methodology which is discussed further in section 4.1
 ## 6. References
 <a id="1">[1]</a> 
 A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020.
+<a id="1">[2]</a> 
+P. Bilokon and Y. Qiu, “Transformers versus lstms for electronic trading,” arXiv preprint arXiv:2309.11400, 2023.
