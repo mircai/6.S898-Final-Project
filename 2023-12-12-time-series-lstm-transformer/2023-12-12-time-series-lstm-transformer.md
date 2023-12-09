@@ -18,7 +18,7 @@ With the growth of ChatGPT in the recent years, extensive research has been done
 ### 2.1 Effect of Dataset Size
 The size of a dataset plays an important role in the performance of an LSTM model versus a transformer model. A study [[1]](#1) done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21% relative difference with 25% of the dataset versus 2.25% relative difference with 80% of the dataset. This makes sense since BERT is a robust transformer architecture that performs better with more data. As shown in the figure below from [[1]](#1), while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases.
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png" alt="Image Description">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png">
 </p>
 While we perform a similar methodology which is discussed further in section 4.1, the major difference is in the type of data we test. Instead of measuring classification accuracy for NLP tasks, this study measures the mean squared error (MSE) loss for regression time series data. 
 
@@ -28,14 +28,39 @@ Theoretically, LSTMs are more robust to noisy data due to its ability to capture
 
 Financial data sets are known to be extremely noisy, and in addition, very hard to find due to their confidential nature. The application of [[2]](#2) gave inspiration to study how the "amount" of noisiness would affect the LSTM and transformer models. Discussed further in section 4.2, this study added various amounts of noise to a clean dataset to see how this would affect each architecture.
 
-## 3. Dataset
+## 3. Methodology
+
+The dataset we will be using throughout this study is the Hourly Energy Consumption dataset that documents hourly energy consumption data in megawatts (MW) from the Eastern Interconnection grid system [[3]](#3). 
+
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/energy_dataset_split.png" width="700">
+</p>
+
+We can utilize this dataset to predict energy consumption over the following features of a dataset.
+- **Size of a dataset**: As discussed in Section 2.1 [[1]](#1), the size of a dataset played an impact in measuring classification accuracy for NLP tasks. Since the energy dataset is numerical, it's important to test the same concept. We leveraged nearly 150,000 data points, progressively extracting subsets ranging from 10% to 90% of the dataset. For each subset, we trained the architectures, allowing us to explore their performance across varying data volumes.
+- **Amount of noise in the dataset**: As discussed in Section 2.2 [[2]](#2), research was done to test LSTMs vs transformers on noisy stock data for various assets. We deemed the energy dataset to be relatively clean since it follows a predictable trend depending on the seasons of the year and time of the day. For example, there are higher energy levels during the winter and daytime hours. To test noise, we added incrementing levels of jittering / Gaussian noise [[4]](#4) to observe the effect of noisy data on LSTMs and transformers.
+- **Output size**: 
 
 ## 4. Experimental Results and Discussion
+
+### 4.1 Size of a Dataset
+
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" width="400">
+</p>
+
+### 4.2 Amount of Noise in a Dataset
+
+### 4.3 Output Size
 
 ## 5. Conclusion
 
 ## 6. References
 <a id="1">[1]</a> 
 A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020.
-<a id="1">[2]</a> 
+<a id="2">[2]</a> 
 P. Bilokon and Y. Qiu, “Transformers versus lstms for electronic trading,” arXiv preprint arXiv:2309.11400, 2023.
+<a id="3">[3]</a>
+R. Mulla, "Hourly Energy Consumption," https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption, 2018.
+<a id="4">[4]</a>
+A. Nikitin, "Time Series Augmentations," https://towardsdatascience.com/time-series-augmentations-16237134b29b#:~:text=via%20magnitude%20warping.-,Window%20Warping,-In%20this%20technique, 2019.
