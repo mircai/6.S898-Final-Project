@@ -44,10 +44,15 @@ We can utilize this dataset to predict energy consumption over the following fea
 ## 4. Experimental Results and Discussion
 
 ### 4.1 Size of a Dataset
+Given the energy consumption dataset described in Section 3, we trained and evaluated an LSTM model and transformer model on progressively increasing subsets ranging from 10% to 90% of the dataset. The figure below shows the normalized mean squared error (MSE) loss for each subset of the dataset. The experimental results show that transformers have an improving trend   
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" width="300">
+</p>
 
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" width="400">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/test_set_pred_40.png" width="700">
 </p>
+
 
 ### 4.2 Amount of Noise in a Dataset
 
@@ -56,11 +61,17 @@ We can utilize this dataset to predict energy consumption over the following fea
 ## 5. Conclusion
 
 ## 6. References
+<p>
 <a id="1">[1]</a> 
 A. Ezen-Can, “A comparison of lstm and bert for small corpus,” arXiv preprint arXiv:2009.05451, 2020.
+</p>
 <a id="2">[2]</a> 
 P. Bilokon and Y. Qiu, “Transformers versus lstms for electronic trading,” arXiv preprint arXiv:2309.11400, 2023.
+<p>
 <a id="3">[3]</a>
 R. Mulla, "Hourly Energy Consumption," https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption, 2018.
+</p>
+<p>
 <a id="4">[4]</a>
 A. Nikitin, "Time Series Augmentations," https://towardsdatascience.com/time-series-augmentations-16237134b29b#:~:text=via%20magnitude%20warping.-,Window%20Warping,-In%20this%20technique, 2019.
+</p>
