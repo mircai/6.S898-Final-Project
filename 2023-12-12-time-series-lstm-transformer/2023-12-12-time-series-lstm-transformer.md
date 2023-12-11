@@ -28,6 +28,12 @@ Theoretically, LSTMs are more robust to noisy data due to its ability to capture
 
 Financial data sets are known to be extremely noisy, and in addition, very hard to find due to their confidential nature. The application of [[2]](#2) gave inspiration to study how the "amount" of noisiness would affect the LSTM and transformer models. Discussed further in section 4.2, this study added various amounts of noise to a clean dataset to see how this would affect each architecture.
 
+### 2.3 Effect of Multi-step Prediction
+gonna relate to this paper: https://arno.uvt.nl/show.cgi?fid=160767
+[[5]](#5)
+they train by filtering out data, less precision
+so ours is novel by seeing if we could keep level of precision but predict into the future
+
 ## 3. Methodology
 
 The dataset we will be using throughout this study is the Hourly Energy Consumption dataset that documents hourly energy consumption data in megawatts (MW) from the Eastern Interconnection grid system [[3]](#3). 
@@ -39,7 +45,7 @@ The dataset we will be using throughout this study is the Hourly Energy Consumpt
 We can utilize this dataset to predict energy consumption over the following features of a dataset.
 - **Size of a dataset**: As discussed in Section 2.1 [[1]](#1), the size of a dataset played an impact in measuring classification accuracy for NLP tasks. Since the energy dataset is numerical, it's important to test the same concept. We leveraged nearly 150,000 data points, progressively extracting subsets ranging from 10% to 90% of the dataset. For each subset, we trained the architectures, allowing us to explore their performance across varying data volumes.
 - **Amount of noise in the dataset**: As discussed in Section 2.2 [[2]](#2), research was done to test LSTMs vs transformers on noisy stock data for various assets. We deemed the energy dataset to be relatively clean since it follows a predictable trend depending on the seasons of the year and time of the day. For example, there are higher energy levels during the winter and daytime hours. To test noise, we added incrementing levels of jittering / Gaussian noise [[4]](#4) to observe the effect of noisy data on LSTMs and transformers.
-- **Output size**: 
+- **Output size**: As discussed in Section 2.3
 
 ## 4. Experimental Results and Discussion
 
@@ -53,12 +59,15 @@ Given the energy consumption dataset described in Section 3, we trained and eval
   <img src="./assets/img/2023-12-12-time-series-lstm-transformer/test_set_pred_40.png" width="700">
 </p>
 
+https://ai.stackexchange.com/questions/20075/why-does-the-transformer-do-better-than-rnn-and-lstm-in-long-range-context-depen this might be helpful for you, the second answer is more concise
+
 
 ### 4.2 Amount of Noise in a Dataset
 
 ### 4.3 Output Size
 
 ## 5. Conclusion
+probably also wanna mention here that one drawback of transformers is that you need a multi-gpu machine in order for it to be parallelizable and train fast. without it, training time is much slower and might not be worth the tradeoffs
 
 ## 6. References
 <p>
@@ -74,4 +83,10 @@ R. Mulla, "Hourly Energy Consumption," https://www.kaggle.com/datasets/robikscub
 <p>
 <a id="4">[4]</a>
 A. Nikitin, "Time Series Augmentations," https://towardsdatascience.com/time-series-augmentations-16237134b29b#:~:text=via%20magnitude%20warping.-,Window%20Warping,-In%20this%20technique, 2019.
+</p>
+<p>
+<a id="5">[5]</a>
+G. Ammann, "Using LSTMs And Transformers
+To Forecast Short-term Residential
+Energy Consumption," https://arno.uvt.nl/show.cgi?fid=160767, 2022.
 </p>
