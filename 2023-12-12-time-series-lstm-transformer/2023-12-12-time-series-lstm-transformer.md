@@ -112,17 +112,31 @@ There were also certain parameters that we kept fixed throughout all variations 
 ## 4. Experimental Results and Discussion
 
 ### 4.1 Size of a Dataset
-Given the energy consumption dataset described in Section 3, we trained and evaluated an LSTM model and transformer model on progressively increasing subsets ranging from 10% to 90% of the dataset. The figure below shows the normalized mean squared error (MSE) loss for each subset of the dataset. The experimental results show that transformers have an improving trend   
+Given the energy consumption dataset described in Section 3, we trained and evaluated an LSTM model and transformer model on progressively increasing subsets ranging from 10% to 90% of the dataset. The figure below shows the normalized mean squared error (MSE) loss for each subset of the dataset. 
 <p align="center">
   <img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" width="300">
 </p>
+The experimental results show that transformers have an improving trend as the size of the dataset increases while the LSTM has an unclear trend. Regardless of the size of the training dataset, the LSTM doesn’t have a consistent result for the testing set. 
+
+The LSTM architecture is extended of the RNN to preserve information over many timesteps. Capturing long-range dependencies requires propagating information through a long chain of dependencies so old observations are forgotten, otherwise known as the vanishing/exploding gradient problem. LSTMs attempt to solve this problem by having separate memory to learn when to forget past or current dependencies. Visually, LSTMs look like the following.    
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/rnn-lstm.png" width="300">
+</p>
+There exist additional gates for a sequence of inputs x^(t) where in addition to the sequence of hidden states h^(t), we also have cell states c^(t) for the aforementioned separate memory. While the LSTM architecture does provide an easier way to learn long-distance dependencies, it isn’t guaranteed to eradicate the vanishing/gradient problem. While the same is true for transformers, the transformer architecture addresses the vanishing/exploding gradient problem in a different way compared to LSTMs. Transformers use techniques like layer normalization, residual connections, and scaled dot-product attention to mitigate these problems.
+
+For time series dataset, the transformer architecture offers the benefit of the self-attention unit. In NLP, it’s typically used to compute similarity scores between words in a sentence. These attention mechanisms help capture relationships between different elements in a sequence, allowing them to learn dependencies regardless of their distance in the sequence. For time series data, transformers might offer advantages over LSTMs in certain scenarios, especially when dealing with longer sequences or when capturing complex relationships within the data such as seasonal changes in energy use.
+
+From a qualitative perspective, if we pull a subset of the test data to observe the predicted values from an LSTM vs a transformer for 40% of the training set, we have the following.
 
 <p align="center">
   <img src="./assets/img/2023-12-12-time-series-lstm-transformer/test_set_pred_40.png" width="700">
 </p>
 
-https://ai.stackexchange.com/questions/20075/why-does-the-transformer-do-better-than-rnn-and-lstm-in-long-range-context-depen this might be helpful for you, the second answer is more concise
+While transformers did perform better than LSTMs, it's not like the LSTM did a horrible job. We notice that at the peaks, the LSTM overshot more than the transformer and at the troughs, the LSTM undershot. However, overall, both architectures still had good results. In the context of the size of time series data, transformers do seem more promising given the loss figure above. It seems that LSTMs are losing that dependency on old observations while transformers are gaining ground as the size of the dataset increases. While <d-cite key="comparison"></d-cite> showed that bidirectional LSTM models achieved significantly higher results than a BERT model for NLP datasets,  
+> the performance of a model is dependent on the task
+and the data, and therefore before making a model choice, these factors should be taken into consideration instead of directly choosing the most popular model. - Ezen-Can 2020
 
+For this experiment, the outlook of large datasets in time series applications for the transformer architecture looks promising. 
 
 ### 4.2 Amount of Noise in a Dataset
 To test the performance of our models on simulated noisy data, we first trained our models on batches of the original clean dataset and then ran our evaluations on different levels of noisy data. Random noise was added according to Gaussian distributions with variances in {0.0, 0.0001, 0.001, 0.002, 0.003, 0.005, 0.008, 0.01} to create these data augmentations. Below is a comparison of the MSE loss for both models as a function of the injected noise variance.
