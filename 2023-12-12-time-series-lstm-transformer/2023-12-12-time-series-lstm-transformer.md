@@ -15,7 +15,7 @@ authors:
     affiliations:
       name: MIT
   - name: Roderick Huang
-    url:
+    url: https://www.linkedin.com/in/rwxhuang/
     affiliations:
       name: MIT
 
@@ -63,9 +63,11 @@ With the growth of ChatGPT in the recent years, extensive research has been done
 
 ### 2.1 Effect of Dataset Size
 The size of a dataset plays an important role in the performance of an LSTM model versus a transformer model. A study <d-cite key="comparison"></d-cite> done in the NLP field compared a pre-trained BERT model with a bidirectional LSTM on different language dataset sizes. They experimentally showed that the LSTM accuracy was higher by 16.21% relative difference with 25% of the dataset versus 2.25% relative difference with 80% of the dataset. This makes sense since BERT is a robust transformer architecture that performs better with more data. As shown in the figure below from <d-cite key="comparison"></d-cite>, while LSTM outperformed BERT, the accuracy difference gets smaller as the perctange of training data used for training increases.
-<p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png">
-</p>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/dataset_size_research_fig.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
 While we perform a similar methodology which is discussed further in section 4.1, the major difference is in the type of data we test. Instead of measuring classification accuracy for NLP tasks, this study measures the mean squared error (MSE) loss for regression time series data. 
 
 ### 2.2 Effect of Noisy Datasets
@@ -86,18 +88,19 @@ However, we would like to extend the results of this paper to learn to also look
 ## 3. Methodology
 
 The dataset we will be using throughout this study is the Hourly Energy Consumption dataset that documents hourly energy consumption data in megawatts (MW) from the Eastern Interconnection grid system <d-cite key="dataset"></d-cite>. 
-
-<p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/energy_dataset_split.png" width="700">
-</p>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        {% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/energy_dataset_split.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
 
 We can utilize this dataset to predict energy consumption over the following features of a dataset.
 - **Size of a dataset**: As discussed in Section 2.1 <d-cite key="comparison"></d-cite>, the size of a dataset played an impact in measuring classification accuracy for NLP tasks. Since the energy dataset is numerical, it's important to test the same concept. We leveraged nearly 150,000 data points, progressively extracting subsets ranging from 10% to 90% of the dataset. For each subset, we trained the architectures, allowing us to explore their performance across varying data volumes.
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_0001.png" width="200">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_001.png" width="200">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_003.png" width="200">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_008.png" width="200">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_0001.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_001.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_003.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_008.png" class="img-fluid rounded z-depth-1" %}
 </p>
 
 - **Amount of noise in the dataset**: As discussed in Section 2.2 <d-cite key="trading"></d-cite>, research was done to test LSTMs vs transformers on noisy stock data for various assets. We deemed the energy dataset to be relatively clean since it follows a predictable trend depending on the seasons of the year and time of the day. For example, there are higher energy levels during the winter and daytime hours. To test noise, we added incrementing levels of jittering / Gaussian noise <d-cite key="augmentations"></d-cite> to observe the effect of noisy data on LSTMs and transformers. Example augmentations with different variances are plotted above in blue against a portion of the original dataset in red.
@@ -114,26 +117,25 @@ There were also certain parameters that we kept fixed throughout all variations 
 ### 4.1 Size of a Dataset
 Given the energy consumption dataset described in Section 3, we trained and evaluated an LSTM model and transformer model on progressively increasing subsets ranging from 10% to 90% of the dataset. The figure below shows the normalized mean squared error (MSE) loss for each subset of the dataset. 
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" width="300">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_trans_dataset_size_res.png" class="img-fluid rounded z-depth-1"%}
 </p>
 The experimental results show that transformers have an improving trend as the size of the dataset increases while the LSTM has an unclear trend. Regardless of the size of the training dataset, the LSTM doesn’t have a consistent result for the testing set. 
 
 The LSTM architecture is extended of the RNN to preserve information over many timesteps. Capturing long-range dependencies requires propagating information through a long chain of dependencies so old observations are forgotten, otherwise known as the vanishing/exploding gradient problem. LSTMs attempt to solve this problem by having separate memory to learn when to forget past or current dependencies. Visually, LSTMs look like the following.    
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/rnn-lstm.png" width="300">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/rnn-lstm.png" class="img-fluid rounded z-depth-1" %}
 </p>
 There exist additional gates for a sequence of inputs x^(t) where in addition to the sequence of hidden states h^(t), we also have cell states c^(t) for the aforementioned separate memory. While the LSTM architecture does provide an easier way to learn long-distance dependencies, it isn’t guaranteed to eradicate the vanishing/gradient problem. While the same is true for transformers, the transformer architecture addresses the vanishing/exploding gradient problem in a different way compared to LSTMs. Transformers use techniques like layer normalization, residual connections, and scaled dot-product attention to mitigate these problems.
 
 For time series dataset, the transformer architecture offers the benefit of the self-attention unit. In NLP, it’s typically used to compute similarity scores between words in a sentence. These attention mechanisms help capture relationships between different elements in a sequence, allowing them to learn dependencies regardless of their distance in the sequence. For time series data, transformers might offer advantages over LSTMs in certain scenarios, especially when dealing with longer sequences or when capturing complex relationships within the data such as seasonal changes in energy use.
 
 From a qualitative perspective, if we pull a subset of the test data to observe the predicted values from an LSTM vs a transformer for 40% of the training set, we have the following.
-
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/test_set_pred_40.png" width="700">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/test_set_pred_40.png" class="img-fluid rounded z-depth-1" %}
 </p>
 
 While transformers did perform better than LSTMs, it's not like the LSTM did a horrible job. We notice that at the peaks, the LSTM overshot more than the transformer and at the troughs, the LSTM undershot. However, overall, both architectures still had good results. In the context of the size of time series data, transformers do seem more promising given the loss figure above. It seems that LSTMs are losing that dependency on old observations while transformers are gaining ground as the size of the dataset increases. While <d-cite key="comparison"></d-cite> showed that bidirectional LSTM models achieved significantly higher results than a BERT model for NLP datasets,  
-> the performance of a model is dependent on the task
+> The performance of a model is dependent on the task
 and the data, and therefore before making a model choice, these factors should be taken into consideration instead of directly choosing the most popular model. - Ezen-Can 2020
 
 For this experiment, the outlook of large datasets in time series applications for the transformer architecture looks promising. 
@@ -142,7 +144,7 @@ For this experiment, the outlook of large datasets in time series applications f
 To test the performance of our models on simulated noisy data, we first trained our models on batches of the original clean dataset and then ran our evaluations on different levels of noisy data. Random noise was added according to Gaussian distributions with variances in {0.0, 0.0001, 0.001, 0.002, 0.003, 0.005, 0.008, 0.01} to create these data augmentations. Below is a comparison of the MSE loss for both models as a function of the injected noise variance.
 
 <p align="center">
-  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noisy_loss.png" width="300">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/noisy_loss.png" class="img-fluid rounded z-depth-1" %}
 </p>
 
 Since loss is not very descriptive in itself, we also visualize the model output for some of these augmented datasets. Red is the true value while blue is predicted.
@@ -154,20 +156,20 @@ Since loss is not very descriptive in itself, we also visualize the model output
     <td><b style="font-size:15px">Transformer</b></td>
  </tr>
  <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_0001.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_0001.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_0001.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_0001.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_002.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_002.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_002.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_002.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_005.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_005.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_005.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_005.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_01.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_01.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_01.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_01.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
 </table>
 </p>
@@ -177,7 +179,7 @@ Both models are shown to start off similarly, predicting very well with no noise
 ### 4.3 Prediction Size
 Finally, we created and trained separate models with varying numbers of output classes to represent the prediction size. We trained on output sizes as percentages of our input size, in increments of 10% from 0% to 100%. Because our input sequence was a constant 10 and our data is given in hourly intervals, these percentages translated to have prediction horizons of 1hr, 2hrs, ..., 10hrs. Evaluating our models resulted in the following MSE loss trends. 
 <p align="center">
-<img src="./assets/img/2023-12-12-time-series-lstm-transformer/prediction_size_loss.png" width="300">
+{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/prediction_size_loss.png" class="img-fluid rounded z-depth-1" %}
 </p>
 
 Again, to get a better sense of why we see these results, we visualize the outputs. Since our outputs are sequences of data, to have a more clean visualization we plot only the last prediction in the sequence. Red is the true value while blue is predicted.
@@ -188,20 +190,20 @@ Again, to get a better sense of why we see these results, we visualize the outpu
     <td><b style="font-size:15px">Transformer</b></td>
  </tr>
  <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_10.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_10.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_10.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_10.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_50.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_50.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_50.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_50.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_80.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_80.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_80.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_80.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
   <tr>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_100.png" width="200"></td>
-    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_100.png" width="200"></td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_100.png" class="img-fluid rounded z-depth-1" %}</td>
+    <td>{% include figure.html path="assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_100.png" class="img-fluid rounded z-depth-1" %}</td>
  </tr>
 </table>
 </p>
