@@ -37,7 +37,7 @@ toc:
     subsections:
     - name: Size of a Dataset
     - name: Amount of Noise in a Dataset
-    - name: Output Size
+    - name: Prediction Size
   - name: "Conclusion"
 
 
@@ -75,10 +75,13 @@ Theoretically, LSTMs are more robust to noisy data due to its ability to capture
 Financial data sets are known to be extremely noisy, and in addition, very hard to find due to their confidential nature. The application of <d-cite key="trading"></d-cite> gave inspiration to study how the "amount" of noisiness would affect the LSTM and transformer models. Discussed further in section 4.2, this study added various amounts of noise to a clean dataset to see how this would affect each architecture.
 
 ### 2.3 Effect of Multi-step Prediction
-gonna relate to this paper: https://arno.uvt.nl/show.cgi?fid=160767
-<d-cite key="multistep"></d-cite>
-they train by filtering out data, less precision
-so ours is novel by seeing if we could keep level of precision but predict into the future
+
+The last feature that we would like to look at between LSTMs and transformer models is forecasting length. Forecasting length describes how far into the future we would like our model to predict based on the input sequence length. One paper <d-cite key="multistep"></d-cite> done on short-term time series prediction finds that transformers were able to outperform LSTMs when it came to predicting over longer horizons. The transformer did better in all three cases when predicting one hour, twelve hours, and an entire day into the future. They accredit these results to the fact that attention better captured longer-term dependencies than recurrence did.
+
+Similarly to this paper, we will focus only on short-term forecasting. Short-term forecasting is important in situations like stock market predictions, where stock values show high volatility in the span of hours and may or may not have learnable trends over long periods of time.
+
+However, we would like to extend the results of this paper to learn to also look at multi-step prediction. This study trained models specifically to have a singular output, with each model being trained with outputs at the specified prediction horizon. Instead, we would look to train our models against outputs of different lengths. We thought it would be an interesting addition to output the entire sequence of data leading up to whatever period in the future, to give a better visualization of what actually happens as forecasting length increases. 
+
 
 ## 3. Methodology
 
@@ -90,8 +93,21 @@ The dataset we will be using throughout this study is the Hourly Energy Consumpt
 
 We can utilize this dataset to predict energy consumption over the following features of a dataset.
 - **Size of a dataset**: As discussed in Section 2.1 <d-cite key="comparison"></d-cite>, the size of a dataset played an impact in measuring classification accuracy for NLP tasks. Since the energy dataset is numerical, it's important to test the same concept. We leveraged nearly 150,000 data points, progressively extracting subsets ranging from 10% to 90% of the dataset. For each subset, we trained the architectures, allowing us to explore their performance across varying data volumes.
-- **Amount of noise in the dataset**: As discussed in Section 2.2 <d-cite key="trading"></d-cite>, research was done to test LSTMs vs transformers on noisy stock data for various assets. We deemed the energy dataset to be relatively clean since it follows a predictable trend depending on the seasons of the year and time of the day. For example, there are higher energy levels during the winter and daytime hours. To test noise, we added incrementing levels of jittering / Gaussian noise <d-cite key="augmentations"></d-cite> to observe the effect of noisy data on LSTMs and transformers.
-- **Output size**: As discussed in Section 2.3
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_0001.png" width="200">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_001.png" width="200">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_003.png" width="200">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noise_variance_008.png" width="200">
+</p>
+
+- **Amount of noise in the dataset**: As discussed in Section 2.2 <d-cite key="trading"></d-cite>, research was done to test LSTMs vs transformers on noisy stock data for various assets. We deemed the energy dataset to be relatively clean since it follows a predictable trend depending on the seasons of the year and time of the day. For example, there are higher energy levels during the winter and daytime hours. To test noise, we added incrementing levels of jittering / Gaussian noise <d-cite key="augmentations"></d-cite> to observe the effect of noisy data on LSTMs and transformers. Example augmentations with different variances are plotted above in blue against a portion of the original dataset in red.
+- **Output size**: As discussed in Section 2.3 <d-cite key="multistep"></d-cite>, there have been few studies measuring the effect of varying the forecasting length, and in the ones that do they still only output one class *at* the specified time into the future. In our novel experimentation, we aimed to generate an entire sequence of outputs *up until* the specified time into the future. We created models that would predict forecasting lengths of 10%, ..., 100% of our input sequence length of 10. To do so, we set the output size of our models to be equal to these forecasting lengths. This involved removing any final dense or convolutional layers.
+
+There were also certain parameters that we kept fixed throughout all variations of our models. The first was training on batches of data with sequence length 10. Second, we trained all of our LSTM models for 500 epochs and all of our transformer models for 10 epochs. These numbers were chosen with some fine-tuning to yield meaningful results while also allowing the training for so many individual models to be done in a reasonable amount of time. 
+
+***NOTE: can we also include like a reference to the lstm model and transformer model we used? we can say we blackboxed it with some tweaks, but think its helpful for them to know the actual architectures i.e. the layers or how we chose to normalize the data before training***
+
+^ if we do follow above note, how about extra subsections like normalization, batching (how we did the window sliding), transformer, and lstm? but completely up to u lol bc i don't rly have time to write these either
 
 ## 4. Experimental Results and Discussion
 
@@ -109,11 +125,78 @@ https://ai.stackexchange.com/questions/20075/why-does-the-transformer-do-better-
 
 
 ### 4.2 Amount of Noise in a Dataset
+To test the performance of our models on simulated noisy data, we first trained our models on batches of the original clean dataset and then ran our evaluations on different levels of noisy data. Random noise was added according to Gaussian distributions with variances in {0.0, 0.0001, 0.001, 0.002, 0.003, 0.005, 0.008, 0.01} to create these data augmentations. Below is a comparison of the MSE loss for both models as a function of the injected noise variance.
 
-### 4.3 Output Size
+<p align="center">
+  <img src="./assets/img/2023-12-12-time-series-lstm-transformer/noisy_loss.png" width="300">
+</p>
+
+Since loss is not very descriptive in itself, we also visualize the model output for some of these augmented datasets. Red is the true value while blue is predicted.
+
+<p align="center">
+<table border="0">
+ <tr>
+    <td><b style="font-size:15px">LSTM</b></td>
+    <td><b style="font-size:15px">Transformer</b></td>
+ </tr>
+ <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_0001.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_0001.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_002.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_002.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_005.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_005.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_noisy_01.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_noisy_01.png" width="200"></td>
+ </tr>
+</table>
+</p>
+
+Both models are shown to start off similarly, predicting very well with no noise. However, almost immediately we can see that the LSTM does not handle noise as well as the transformer. LSTM makes much noisier predictions with many more outliers. One possibility for this happening is ***HELP i actually have no idea why***
+
+### 4.3 Prediction Size
+Finally, we created and trained separate models with varying numbers of output classes to represent the prediction size. We trained on output sizes as percentages of our input size, in increments of 10% from 0% to 100%. Because our input sequence was a constant 10 and our data is given in hourly intervals, these percentages translated to have prediction horizons of 1hr, 2hrs, ..., 10hrs. Evaluating our models resulted in the following MSE loss trends. 
+<p align="center">
+<img src="./assets/img/2023-12-12-time-series-lstm-transformer/prediction_size_loss.png" width="300">
+</p>
+
+Again, to get a better sense of why we see these results, we visualize the outputs. Since our outputs are sequences of data, to have a more clean visualization we plot only the last prediction in the sequence. Red is the true value while blue is predicted.
+<p align="center">
+<table border="0">
+ <tr>
+    <td><b style="font-size:15px">LSTM</b></td>
+    <td><b style="font-size:15px">Transformer</b></td>
+ </tr>
+ <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_10.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_10.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_50.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_50.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_80.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_80.png" width="200"></td>
+ </tr>
+  <tr>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/lstm_pred_100.png" width="200"></td>
+    <td><img src="./assets/img/2023-12-12-time-series-lstm-transformer/transformer_pred_100.png" width="200"></td>
+ </tr>
+</table>
+</p>
+
+As we can see, the MSE loss of our transformer model increased at a slower rate than our LSTM model. After comparing the outputs of our models at these time steps, it becomes evident that this trend is due to the LSTM losing characteristic over time. Our transformer simply performs worse when it has to predict more as expected because the data is not perfectly periodic. However, we infer that the LSTM outputs get flatter over time because the more we accumulate memory through the long-term mechanism, the less weight each previous time step holds, diluting the total amount of information carried through the sequence. Transformers avoid this problem by using their attention mechanisms instead to keep only the important information throughout.
 
 ## 5. Conclusion
 probably also wanna mention here that one drawback of transformers is that you need a multi-gpu machine in order for it to be parallelizable and train fast. without it, training time is much slower and might not be worth the tradeoffs
+
 
 <!-- ## 6. References
 <p>
